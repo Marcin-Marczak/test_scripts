@@ -1,7 +1,9 @@
 from selenium import webdriver
 from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.common.keys import Keys
 import pytest
 from faker import Faker
+import time
 
 # This script is dedicated to sign up to newsletter of NH Hotels.
 # t_01 is a positive test - with valid data (user is able to sign up to newsletter),
@@ -51,8 +53,10 @@ class Tests:
         self.driver.find_elements_by_xpath(locator_country_language)[1].click()
         self.driver.find_elements_by_xpath(locator_select_language)[1].click()
         self.driver.find_element_by_xpath(locator_private_policy).click()
-        self.driver.save_screenshot("screenshots/test_01_positive_all_data_valid.png")
+        self.driver.save_screenshot("screenshots/test_01_1_positive_all_data_valid.png")
         self.driver.find_element_by_xpath(locator_send).click()
+        time.sleep(2)
+        self.driver.save_screenshot("screenshots/test_01_2_positive_all_data_valid.png")
         assert confirmation_text == self.driver.find_element_by_xpath("//h2[@class='h3']").text
 
     def test_02_blank_name(self, setup):
@@ -100,15 +104,15 @@ class Tests:
 
     def test_05_blank_email(self, setup):
         fake = Faker("fr")
-        self.driver.find_element_by_id(locator_name).send_keys(fake.first_name_male())
-        self.driver.find_element_by_id(locator_lastname).send_keys(fake.last_name_male())
-        self.driver.find_element_by_id(locator_confirm_email).send_keys(fake.email())
         self.driver.find_elements_by_xpath(locator_country_language)[0].click()
         self.driver.find_element_by_xpath(locator_select_country).click()
         self.driver.find_elements_by_xpath(locator_country_language)[1].click()
         self.driver.find_elements_by_xpath(locator_select_language)[1].click()
         self.driver.find_element_by_xpath(locator_private_policy).click()
-        self.driver.find_element_by_xpath(locator_send).click()
+        self.driver.find_element_by_id(locator_name).send_keys(fake.first_name_male())
+        self.driver.find_element_by_id(locator_lastname).send_keys(fake.last_name_male())
+        self.driver.find_element_by_id(locator_confirm_email).send_keys(fake.email())
+        self.driver.find_element_by_id(locator_confirm_email).send_keys(Keys.ENTER)
         self.driver.save_screenshot("screenshots/test_05_blank_email.png")
         assert error_message == self.driver.find_elements_by_xpath(locator_error)[0].text
         assert error_message_emails_not_match == self.driver.find_elements_by_xpath(locator_error)[1].text
@@ -145,15 +149,15 @@ class Tests:
 
     def test_08_emails_not_match(self, setup):
         fake = Faker("ja")
-        self.driver.find_element_by_id(locator_name).send_keys(fake.first_name_male())
-        self.driver.find_element_by_id(locator_lastname).send_keys(fake.last_name_male())
-        self.driver.find_element_by_id(locator_email).send_keys(fake.email())
-        self.driver.find_element_by_id(locator_confirm_email).send_keys(fake.email())
         self.driver.find_elements_by_xpath(locator_country_language)[0].click()
         self.driver.find_element_by_xpath(locator_select_country).click()
         self.driver.find_elements_by_xpath(locator_country_language)[1].click()
         self.driver.find_elements_by_xpath(locator_select_language)[1].click()
         self.driver.find_element_by_xpath(locator_private_policy).click()
+        self.driver.find_element_by_id(locator_name).send_keys(fake.first_name_male())
+        self.driver.find_element_by_id(locator_lastname).send_keys(fake.last_name_male())
+        self.driver.find_element_by_id(locator_email).send_keys(fake.email())
+        self.driver.find_element_by_id(locator_confirm_email).send_keys(fake.email())
         self.driver.find_element_by_xpath(locator_send).click()
         self.driver.save_screenshot("screenshots/test_08_emails_not_match.png")
         assert error_message_emails_not_match == self.driver.find_element_by_xpath(locator_error).text
