@@ -1,9 +1,11 @@
 from selenium import webdriver
 from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.common.keys import Keys
 import pytest
 from faker import Faker
-import time
+
 
 # This script is dedicated to sign up to newsletter of NH Hotels.
 # t_01 is a positive test - with valid data (user is able to sign up to newsletter),
@@ -20,6 +22,7 @@ locator_select_language = "//li[@data-original-index='4']"
 locator_private_policy = "//label[@for='GDPR_flag_6']"
 locator_send = "//input[@value='Send']"
 locator_error = "//ul[@role='alert']/li"
+locator_url_success = "https://www.nh-hotels.com/newsletter/success"
 
 # Variables used in asserts:
 confirmation_text = 'THANK YOU FOR SUBSCRIBING TO OUR NEWSLETTER!'
@@ -55,7 +58,7 @@ class Tests:
         self.driver.find_element_by_xpath(locator_private_policy).click()
         self.driver.save_screenshot("screenshots/test_01_1_positive_all_data_valid.png")
         self.driver.find_element_by_xpath(locator_send).click()
-        time.sleep(2)
+        WebDriverWait(self.driver, 10, 0.5).until(ec.url_to_be, locator_url_success)
         self.driver.save_screenshot("screenshots/test_01_2_positive_all_data_valid.png")
         assert confirmation_text == self.driver.find_element_by_xpath("//h2[@class='h3']").text
 
